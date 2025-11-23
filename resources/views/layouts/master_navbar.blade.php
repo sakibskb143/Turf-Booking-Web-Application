@@ -86,6 +86,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.signup') }}">Signup</a>
                     </li>
+                    <a class="nav-link" href="{{ route('user.dashboard') }}">User Dashboard</a>
+
+                   <li class="nav-item">
+    <a class="nav-link" href="{{ route('owner.dashboard') }}">Owner Dashboard</a>
+</li>
+
                 </ul>
             </div>
 

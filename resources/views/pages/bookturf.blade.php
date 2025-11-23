@@ -256,40 +256,55 @@
 <section class="container my-5">
     <h2 class="section-title">Explore Categories</h2>
     <div class="row g-4">
+
         <div class="col-md-4">
             <div class="card category-card">
-                <img src="https://images.unsplash.com/photo-1607414721186-5309963d7b52?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=436" class="card-img-top" alt="Football">
+                <img src="https://images.unsplash.com/photo-1607414721186-5309963d7b52?auto=format&fit=crop&w=436" class="card-img-top" alt="Football">
                 <div class="card-body text-center">
                     <h5 class="card-title fw-bold">Football</h5>
                     <p class="text-muted">Book premium football fields and practice grounds.</p>
-                    <a href="#" class="btn btn-success btn-sm">View Fields</a>
+
+                    <a href="{{ url('booking-system/football') }}" class="btn btn-success btn-sm">
+                        View Fields
+                    </a>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="card category-card">
-                <img src="https://images.unsplash.com/photo-1671209151455-86980f5bf293?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=435" class="card-img-top" alt="Cricket">
+                <img src="https://images.unsplash.com/photo-1671209151455-86980f5bf293?auto=format&fit=crop&w=435" class="card-img-top" alt="Cricket">
                 <div class="card-body text-center">
                     <h5 class="card-title fw-bold">Cricket</h5>
                     <p class="text-muted">Rent quality turfs and nets for cricket practice or matches.</p>
-                    <a href="#" class="btn btn-success btn-sm">View Fields</a>
+
+                    <a href="{{ url('booking-system/cricket') }}" class="btn btn-success btn-sm">
+                        View Fields
+                    </a>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="card category-card">
-                <img src="https://images.unsplash.com/photo-1615294295454-1f3dcdc86468?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1032" class="card-img-top" alt="Tennis">
+                <img src="https://images.unsplash.com/photo-1615294295454-1f3dcdc86468?auto=format&fit=crop&w=1032" class="card-img-top" alt="Tennis">
                 <div class="card-body text-center">
                     <h5 class="card-title fw-bold">Tennis</h5>
                     <p class="text-muted">Find professional tennis courts in your area.</p>
-                    <a href="#" class="btn btn-success btn-sm">View Fields</a>
+
+                    <a href="{{ url('booking-system/tennis') }}" class="btn btn-success btn-sm">
+                        View Fields
+                    </a>
+
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
 
 <!-- HOW IT WORKS SECTION -->
 <section id="how-it-works" class="container my-5">
