@@ -47,6 +47,13 @@
         .nav-link:hover {
             color: #16a34a !important;
         }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
     </style>
 </head>
 
@@ -78,20 +85,61 @@
                 </ul>
             </div>
 
+            @php
+                $user = auth()->user();
+                $dashboardRoute = $user? match ($user->role) {
+                    'admin' => route('admin.dashboard'),
+                    'owner' => route('owner.dashboard'),
+                    default => route('user.dashboard'),
+                } : null;
+                $avatarUrl = $user?->profile_image
+                    ? asset('storage/' . ltrim($user->profile_image, '/'))
+                    : ($user ? 'https://ui-avatars.com/api/?background=16a34a&color=fff&name=' . urlencode($user->name) : null);
+            @endphp
+
             <div class="d-flex align-items-center">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.signup') }}">Signup</a>
-                    </li>
-                    <a class="nav-link" href="{{ route('user.dashboard') }}">User Dashboard</a>
+                <ul class="navbar-nav align-items-center">
+                    @guest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('users.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('users.signup') }}">Signup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('owners.login') }}">Owner Login</a>
+                        </li>
+                    @endguest
 
-                   <li class="nav-item">
-    <a class="nav-link" href="{{ route('owner.dashboard') }}">Owner Dashboard</a>
-</li>
-
+                    @auth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ $dashboardRoute }}">{{ ucfirst(auth()->user()->role) }} Dashboard</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ $avatarUrl }}" alt="avatar" class="avatar me-2">
+                                <span>{{ $user->name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li class="px-3 py-2">
+                                    <div class="fw-semibold">{{ $user->name }}</div>
+                                    <div class="text-muted small">{{ $user->email }}</div>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button class="dropdown-item text-danger" type="submit">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @endauth
                 </ul>
             </div>
 

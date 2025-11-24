@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('turf_id')->constrained('turfs')->onDelete('cascade');
             $table->foreignId('slot_id')->constrained('slots')->onDelete('cascade');
+            $table->decimal('total_amount', 10, 2)->default(0);
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid');
             $table->timestamps();

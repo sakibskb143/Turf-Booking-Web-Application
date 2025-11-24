@@ -101,11 +101,24 @@
         <h2 class="auth-title">Welcome Back!</h2>
         <p class="auth-subtitle">Login to continue to your dashboard</p>
 
-        <form action="" method="POST">
+        <form action="{{ route('users.authenticate') }}" method="POST">
             @csrf
+
+            @if (session('status'))
+                <div class="alert alert-success small">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger small">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
             <div class="mb-3">
                 <label class="form-label">Email Address</label>
-                <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="Enter your email" required>
             </div>
 
             <div class="mb-4 password-toggle">

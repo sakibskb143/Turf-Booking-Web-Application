@@ -1,5 +1,3 @@
-<?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,10 +8,10 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('message', 255);
-            $table->enum('type', ['booking', 'payment', 'system', 'announcement']);
-            $table->enum('status', ['unread', 'read'])->default('unread');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('message');
+            $table->string('type');
+            $table->string('status')->default('unread');
             $table->timestamps();
         });
     }

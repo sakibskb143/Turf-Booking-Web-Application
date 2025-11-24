@@ -62,27 +62,34 @@
         <h2 class="auth-title">Create Owner Account</h2>
         <p class="auth-subtitle">Join us and manage your turf bookings!</p>
 
-        <form action="" method="POST">
+        <form action="{{ route('owners.register') }}" method="POST">
             @csrf
+
+            @if ($errors->any())
+                <div class="alert alert-danger small">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
+                    <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Enter your full name" required>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="Enter your email" required>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Phone</label>
-                    <input type="text" name="phone" class="form-control" placeholder="Enter your phone number">
+                    <input type="text" name="phone" value="{{ old('phone') }}" class="form-control" placeholder="Enter your phone number">
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Address</label>
-                    <input type="text" name="address" class="form-control" placeholder="Enter your address">
+                    <input type="text" name="address" value="{{ old('address') }}" class="form-control" placeholder="Enter your address">
                 </div>
 
                 <div class="col-12 password-toggle">
@@ -103,7 +110,7 @@
 
                 <div class="col-12 terms">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
                         <label class="form-check-label" for="terms">
                             I agree to the <a href="#">terms and conditions</a> and <a href="#">privacy policy</a>.
                         </label>

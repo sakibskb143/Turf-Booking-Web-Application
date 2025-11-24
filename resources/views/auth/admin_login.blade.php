@@ -100,15 +100,28 @@
         <h5 class="fw-bold mb-2">Admin Login</h5>
         <p class="text-muted mb-4">Access your TurfBook admin panel</p>
 
-        <form>
+        @if (session('status'))
+            <div class="alert alert-success text-start small">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger text-start small">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.authenticate') }}">
+            @csrf
             <div class="mb-3 text-start">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" class="form-control" placeholder="Enter your admin email" required>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your admin email" required>
             </div>
 
             <div class="mb-4 text-start">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
             </div>
 
             <button type="submit" class="btn-login">Login</button>

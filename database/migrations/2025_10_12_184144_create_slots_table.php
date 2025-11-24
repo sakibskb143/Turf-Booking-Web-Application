@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::create('slots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('field_id')->constrained('fields')->onDelete('cascade');
+            $table->foreignId('turf_id')->constrained('turfs')->onDelete('cascade');
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
             $table->decimal('price', 10, 2);
             $table->enum('status', ['available', 'booked', 'cancelled'])->default('available');
             $table->timestamps();
+
+            $table->unique(['turf_id', 'date', 'start_time', 'end_time'], 'slots_unique_schedule');
         });
     }
 

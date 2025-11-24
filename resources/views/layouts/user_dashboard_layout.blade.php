@@ -87,22 +87,29 @@
 
       
 
-        <a href="{{ route('user.dashboard') }}" class="{{ Request::is('user/dashboard') ? 'active-link' : '' }}">
+        <a href="{{ route('user.dashboard') }}" class="{{ request()->is('user/dashboard') ? 'active-link' : '' }}">
             <i class="bi bi-speedometer2 me-2"></i> Dashboard
         </a>
 
       
-        <a href="{{ route('user.bookings') }}" class="{{ Request::is('user/bookings') ? 'active-link' : '' }}">
+        <a href="{{ route('user.bookings') }}" class="{{ request()->is('user/bookings') ? 'active-link' : '' }}">
             <i class="bi bi-calendar-check me-2"></i> My Booking History
         </a>
 
-        <a href="{{ route('user.profile') }}" class="{{ Request::is('user/profile') ? 'active-link' : '' }}">
+        <a href="{{ route('user.notifications') }}" class="{{ request()->is('user/notifications') ? 'active-link' : '' }}">
+            <i class="bi bi-bell me-2"></i> Notifications
+        </a>
+
+        <a href="{{ route('user.profile') }}" class="{{ request()->is('user/profile') ? 'active-link' : '' }}">
             <i class="bi bi-person-circle me-2"></i> Profile
         </a>
 
-        <a href="">
-            <i class="bi bi-box-arrow-right me-2"></i> Logout
-        </a>
+        <form method="POST" action="{{ route('logout') }}" class="px-3 mt-3">
+            @csrf
+            <button type="submit" class="btn btn-outline-danger w-100">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
+            </button>
+        </form>
     </div>
 
 

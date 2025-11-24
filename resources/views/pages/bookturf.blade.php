@@ -340,167 +340,120 @@
 
     <!-- Filter Bar -->
     <div class="filter-bar mb-4">
-        <div class="row g-3 align-items-center">
+        <form class="row g-3 align-items-center" method="GET" action="{{ route('bookturf') }}">
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Search by field name...">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by turf name...">
             </div>
             <div class="col-md-2">
-                <select class="form-select">
-                    <option selected>All Categories</option>
-                    <option value="football">Football</option>
-                    <option value="cricket">Cricket</option>
-                    <option value="tennis">Tennis</option>
-                    <option value="badminton">Badminton</option>
-                    <option value="basketball">Basketball</option>
+                <select class="form-select" name="sport">
+                    <option value="">All Sports</option>
+                    @foreach ($sportFilters as $sport)
+                        <option value="{{ $sport }}" @selected(request('sport') === $sport)>{{ ucfirst($sport) }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-2">
-                <select class="form-select">
-                    <option selected>All Locations</option>
-                    <option value="north">North City</option>
-                    <option value="south">South City</option>
-                    <option value="east">East City</option>
-                    <option value="west">West City</option>
+                <select class="form-select" name="city">
+                    <option value="">All Locations</option>
+                    @foreach ($cityFilters as $city)
+                        <option value="{{ $city }}" @selected(request('city') === $city)>{{ $city }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-3">
-                <input type="date" class="form-control" value="{{ date('Y-m-d') }}">
+                <input type="date" name="date" class="form-control" value="{{ $selectedDate }}">
             </div>
             <div class="col-md-2 text-end">
-                <button class="btn btn-dark">Search Slots</button>
+                <button class="btn btn-dark w-100">Search Slots</button>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Sort Options -->
     <div class="sort-options">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <span class="text-muted">Showing 12 available slots</span>
-            </div>
-            <div class="col-md-6 text-end">
-                <span class="me-2">Sort by:</span>
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-dark btn-sm active">Price</button>
-                    <button type="button" class="btn btn-outline-dark btn-sm">Rating</button>
-                    <button type="button" class="btn btn-outline-dark btn-sm">Distance</button>
-                </div>
-            </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <span class="text-muted">Showing {{ $turfs->count() }} turfs for {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}</span>
+            <small class="text-muted">Choose a slot to book instantly.</small>
         </div>
     </div>
+
+    @if (session('status'))
+        <div class="alert alert-success mt-3">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @error('slot_id')
+        <div class="alert alert-danger mt-3">
+            {{ $message }}
+        </div>
+    @enderror
 
     <!-- Slots Cards -->
     <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card field-card">
-                <div class="card-body">
-                    <span class="badge badge-popular mb-2">Popular</span>
-                    <h6 class="fw-bold">Green Valley Football Field A</h6>
-                    <p class="text-muted small mb-1">Green Valley Sports Complex</p>
-                    <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt"></i> 2.3 km away</p>
-                    <div class="card-rating mb-2">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span class="text-muted">(24 reviews)</span>
+        @forelse ($turfs as $turf)
+            <div class="col-md-4">
+                <div class="card field-card h-100">
+                    @if ($turf->image_url)
+                        <img src="{{ $turf->image_url }}" class="card-img-top" alt="{{ $turf->name }}">
+                    @endif
+                    <div class="card-body">
+                        <span class="badge {{ $turf->slots->where('status', 'available')->count() ? 'badge-available' : 'badge-booked' }} mb-2">
+                            {{ strtoupper($turf->sport_type) }}
+                        </span>
+                        <h6 class="fw-bold">{{ $turf->name }}</h6>
+                        <p class="text-muted small mb-1">{{ $turf->location }}</p>
+                        <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt"></i> {{ $turf->city }}</p>
+                        <p class="field-price">₹{{ number_format($turf->base_price, 2) }} per hour</p>
+
+                        <h6 class="mt-3">Slots on {{ \Carbon\Carbon::parse($selectedDate)->format('d M, Y') }}</h6>
+
+                        @forelse ($turf->slots as $slot)
+                            @php
+                                $isBooked = $slot->bookings->where('status', '!=', 'cancelled')->isNotEmpty();
+                                $slotAvailable = !$isBooked && $slot->status === 'available';
+                                $startTime = is_string($slot->start_time) ? $slot->start_time : date('H:i', strtotime($slot->start_time));
+                                $endTime = is_string($slot->end_time) ? $slot->end_time : date('H:i', strtotime($slot->end_time));
+                            @endphp
+                            <div class="border rounded p-2 mb-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-0 small">
+                                        <i class="fas fa-clock"></i>
+                                        {{ $startTime }} - {{ $endTime }}
+                                    </p>
+                                    <small class="text-muted">₹{{ number_format($slot->price, 2) }}</small>
+                                </div>
+                                @if ($slotAvailable)
+                                    @auth
+                                        @if (auth()->user()->role === 'user')
+                                            <form method="POST" action="{{ route('bookings.store') }}">
+                                                @csrf
+                                                <input type="hidden" name="slot_id" value="{{ $slot->id }}">
+                                                <button class="btn btn-success btn-sm">Book</button>
+                                            </form>
+                                        @else
+                                            <span class="badge bg-warning text-dark">Login as user to book</span>
+                                        @endif
+                                    @else
+                                        <a href="{{ route('users.login') }}" class="btn btn-outline-success btn-sm">Login to Book</a>
+                                    @endauth
+                                @else
+                                    <span class="badge badge-booked">Booked</span>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-muted small">No slots for this date. Try another date.</p>
+                        @endforelse
                     </div>
-                    <p class="text-muted small mb-1">{{ date('Y-m-d') }} | 06:00 - 07:00</p>
-                    <p class="text-muted small mb-1">Capacity: 22 players</p>
-                    <div class="card-amenities mb-2">
-                        <span class="me-2"><i class="fas fa-shower amenity-icon"></i>Showers</span>
-                        <span><i class="fas fa-car amenity-icon"></i>Parking</span>
-                    </div>
-                    <p class="field-price">₹1200 per hour <span class="badge badge-available float-end">Available</span></p>
-                    <a href="#" class="btn btn-dark btn-sm btn-book w-100">Book Now</a>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card field-card">
-                <div class="card-body">
-                    <h6 class="fw-bold">Green Valley Football Field A</h6>
-                    <p class="text-muted small mb-1">Green Valley Sports Complex</p>
-                    <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt"></i> 2.3 km away</p>
-                    <div class="card-rating mb-2">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                        <span class="text-muted">(24 reviews)</span>
-                    </div>
-                    <p class="text-muted small mb-1">{{ date('Y-m-d') }} | 18:00 - 19:00</p>
-                    <p class="text-muted small mb-1">Capacity: 22 players</p>
-                    <div class="card-amenities mb-2">
-                        <span class="me-2"><i class="fas fa-shower amenity-icon"></i>Showers</span>
-                        <span><i class="fas fa-car amenity-icon"></i>Parking</span>
-                    </div>
-                    <p class="field-price">₹1500 per hour <span class="badge badge-available float-end">Available</span></p>
-                    <a href="#" class="btn btn-dark btn-sm btn-book w-100">Book Now</a>
+        @empty
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No turfs available for your filters. Try adjusting your search.
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card field-card">
-                <div class="card-body">
-                    <h6 class="fw-bold">Green Valley Football Field B</h6>
-                    <p class="text-muted small mb-1">Green Valley Sports Complex</p>
-                    <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt"></i> 2.5 km away</p>
-                    <div class="card-rating mb-2">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span class="text-muted">(32 reviews)</span>
-                    </div>
-                    <p class="text-muted small mb-1">{{ date('Y-m-d') }} | 19:00 - 20:00</p>
-                    <p class="text-muted small mb-1">Capacity: 22 players</p>
-                    <div class="card-amenities mb-2">
-                        <span class="me-2"><i class="fas fa-shower amenity-icon"></i>Showers</span>
-                        <span><i class="fas fa-car amenity-icon"></i>Parking</span>
-                    </div>
-                    <p class="field-price">₹1400 per hour <span class="badge badge-available float-end">Available</span></p>
-                    <a href="#" class="btn btn-dark btn-sm btn-book w-100">Book Now</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card field-card">
-                <div class="card-body">
-                    <span class="badge badge-popular mb-2">Popular</span>
-                    <h6 class="fw-bold">City Cricket Ground</h6>
-                    <p class="text-muted small mb-1">City Sports Center</p>
-                    <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt"></i> 1.8 km away</p>
-                    <div class="card-rating mb-2">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                        <span class="text-muted">(18 reviews)</span>
-                    </div>
-                    <p class="text-muted small mb-1">{{ date('Y-m-d', strtotime('+1 day')) }} | 16:00 - 18:00</p>
-                    <p class="text-muted small mb-1">Capacity: 30 players</p>
-                    <div class="card-amenities mb-2">
-                        <span class="me-2"><i class="fas fa-shower amenity-icon"></i>Showers</span>
-                        <span><i class="fas fa-utensils amenity-icon"></i>Cafeteria</span>
-                    </div>
-                    <p class="field-price">₹2000 per hour <span class="badge badge-available float-end">Available</span></p>
-                    <a href="#" class="btn btn-dark btn-sm btn-book w-100">Book Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load More Button -->
-    <div class="text-center mt-5">
-        <button class="btn btn-outline-dark">Load More Slots</button>
+        @endforelse
     </div>
 </section>
 

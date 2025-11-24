@@ -70,12 +70,12 @@
 
             <div class="col-md-6">
                 <label class="form-label">Full Name</label>
-                <input class="form-control" value="John Doe">
+                <input class="form-control" value="{{ $user->name }}" disabled>
             </div>
 
             <div class="col-md-6">
                 <label class="form-label">Email Address</label>
-                <input class="form-control" value="john.doe@example.com" disabled>
+                <input class="form-control" value="{{ $user->email }}" disabled>
                 <small class="text-muted">Email cannot be changed. Contact support if needed.</small>
             </div>
 
@@ -83,18 +83,18 @@
                 <label class="form-label">Phone Number</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                    <input class="form-control" value="+91 9876543210">
+                    <input class="form-control" value="{{ $user->phone ?? 'Not added' }}" disabled>
                 </div>
             </div>
 
             <div class="col-md-12">
                 <label class="form-label">Address</label>
-                <textarea class="form-control" rows="2">123 Sports Street, Green Valley, Mumbai - 400001</textarea>
+                <textarea class="form-control" rows="2" disabled>{{ $user->address ?? 'Add your address in profile settings.' }}</textarea>
             </div>
 
             <div class="col-md-12">
                 <label class="form-label">Bio</label>
-                <textarea class="form-control" rows="3">Passionate football player who loves weekend games with friends.</textarea>
+                <textarea class="form-control" rows="3" disabled>Keep playing, {{ $user->name }}!</textarea>
             </div>
 
         </div>

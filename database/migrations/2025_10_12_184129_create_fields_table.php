@@ -8,10 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('fields', function (Blueprint $table) {
+        Schema::create('turfs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->string('name', 100);
+            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->string('name', 150);
+            $table->string('slug')->unique();
+            $table->string('sport_type', 100);
+            $table->string('location');
+            $table->string('city', 120)->nullable();
+            $table->text('description')->nullable();
+            $table->decimal('base_price', 10, 2)->default(0);
+            $table->string('image_url')->nullable();
             $table->enum('status', ['active', 'inactive', 'maintenance'])->default('active');
             $table->timestamps();
         });
@@ -19,6 +27,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('fields');
+        Schema::dropIfExists('turfs');
     }
 };
