@@ -2,79 +2,54 @@
 
 @section('content')
 <div class="container-fluid">
-
     <h3 class="fw-bold mb-3">Booking Management</h3>
-    <p class="text-muted">Review and manage all booking requests for your fields.</p>
+    <p class="text-muted">Review and manage all booking requests for your turfs.</p>
+
+    @if(session('status'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('status') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     {{-- Top Stats --}}
     <div class="row g-4 mb-4">
         <div class="col-md-3">
             <div class="card card-stats p-3 shadow-sm">
                 <p class="text-muted mb-1">Total Bookings</p>
-                <h4 class="fw-bold">8</h4>
+                <h4 class="fw-bold">{{ $stats['total'] ?? 0 }}</h4>
             </div>
         </div>
-
         <div class="col-md-3">
             <div class="card card-stats p-3 shadow-sm">
                 <p class="text-muted mb-1">Pending Approval</p>
-                <h4 class="fw-bold text-warning">2</h4>
+                <h4 class="fw-bold text-warning">{{ $stats['pending'] ?? 0 }}</h4>
             </div>
         </div>
-
         <div class="col-md-3">
             <div class="card card-stats p-3 shadow-sm">
                 <p class="text-muted mb-1">Confirmed</p>
-                <h4 class="fw-bold text-success">5</h4>
+                <h4 class="fw-bold text-success">{{ $stats['confirmed'] ?? 0 }}</h4>
             </div>
         </div>
-
         <div class="col-md-3">
             <div class="card card-stats p-3 shadow-sm">
                 <p class="text-muted mb-1">Cancelled</p>
-                <h4 class="fw-bold text-danger">1</h4>
-            </div>
-        </div>
-    </div>
-
-    {{-- Filter Section --}}
-    <div class="card p-3 shadow-sm mb-4">
-        <h6 class="fw-bold mb-3">Filter Bookings</h6>
-
-        <div class="row g-3">
-            <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Search by customer, booking ID or field">
-            </div>
-
-            <div class="col-md-3">
-                <select class="form-select">
-                    <option>All Status</option>
-                    <option>Pending</option>
-                    <option>Confirmed</option>
-                    <option>Cancelled</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <select class="form-select">
-                    <option>All Categories</option>
-                    <option>Football</option>
-                    <option>Cricket</option>
-                    <option>Tennis</option>
-                </select>
-            </div>
-
-            <div class="col-md-2 text-end">
-                <button class="btn btn-outline-secondary w-100">
-                    <i class="bi bi-download me-1"></i> Export
-                </button>
+                <h4 class="fw-bold text-danger">{{ $stats['cancelled'] ?? 0 }}</h4>
             </div>
         </div>
     </div>
 
     {{-- Bookings Table --}}
     <div class="card shadow-sm p-3">
-        <h6 class="fw-bold mb-3">All Bookings (8)</h6>
+        <h6 class="fw-bold mb-3">All Bookings ({{ $bookings->total() }})</h6>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -82,60 +57,86 @@
                     <tr>
                         <th>Booking ID</th>
                         <th>Customer</th>
-                        <th>Field</th>
+                        <th>Turf</th>
                         <th>Date & Time</th>
                         <th>Status</th>
                         <th>Amount</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    {{-- Row 1 --}}
-                    <tr>
-                        <td>#BK101</td>
-                        <td>John Doe</td>
-                        <td>Football Field A</td>
-                        <td>2024-01-15<br>06:00 - 07:00</td>
-                        <td><span class="badge bg-warning text-dark">Pending</span></td>
-                        <td>₹1200</td>
-                        <td class="text-center">
-                            <button class="btn btn-success btn-sm"><i class="bi bi-check"></i></button>
-                            <button class="btn btn-danger btn-sm"><i class="bi bi-x"></i></button>
-                        </td>
-                    </tr>
-
-                    {{-- Row 2 --}}
-                    <tr>
-                        <td>#BK102</td>
-                        <td>Sarah Wilson</td>
-                        <td>Cricket Ground</td>
-                        <td>2024-01-16<br>18:00 - 20:00</td>
-                        <td><span class="badge bg-success">Confirmed</span></td>
-                        <td>₹2000</td>
-                        <td class="text-center">
-                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-eye"></i></button>
-                        </td>
-                    </tr>
-
-                    {{-- Row 3 --}}
-                    <tr>
-                        <td>#BK103</td>
-                        <td>Mark Stevens</td>
-                        <td>Tennis Court 1</td>
-                        <td>2024-01-16<br>16:00 - 17:00</td>
-                        <td><span class="badge bg-danger">Cancelled</span></td>
-                        <td>₹700</td>
-                        <td class="text-center">
-                            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-eye"></i></button>
-                        </td>
-                    </tr>
-
-                    {{-- Add more rows here as needed --}}
+                    @forelse($bookings ?? [] as $booking)
+                        <tr>
+                            <td>#BK{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</td>
+                            <td>
+                                <strong>{{ $booking->user->name }}</strong><br>
+                                <small class="text-muted">{{ $booking->user->email }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ $booking->turf->name }}</strong><br>
+                                <small class="text-muted">{{ $booking->turf->sport_type }}</small>
+                            </td>
+                            <td>
+                                {{ $booking->slot->date->format('Y-m-d') }}<br>
+                                <small class="text-muted">
+                                    {{ is_string($booking->slot->start_time) ? $booking->slot->start_time : date('H:i', strtotime($booking->slot->start_time)) }} - 
+                                    {{ is_string($booking->slot->end_time) ? $booking->slot->end_time : date('H:i', strtotime($booking->slot->end_time)) }}
+                                </small>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $booking->status === 'confirmed' ? 'success' : ($booking->status === 'pending' ? 'warning text-dark' : 'danger') }}">
+                                    {{ ucfirst($booking->status) }}
+                                </span>
+                            </td>
+                            <td>₹{{ number_format($booking->total_amount, 2) }}</td>
+                            <td class="text-center">
+                                @if($booking->status === 'pending')
+                                    <form method="POST" action="{{ route('owner.bookings.updateStatus', $booking) }}" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="status" value="confirmed">
+                                        <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('owner.bookings.updateStatus', $booking) }}" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="status" value="cancelled">
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Reject">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('owner.bookings.updateStatus', $booking) }}" class="d-inline">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="status" value="{{ $booking->status === 'confirmed' ? 'cancelled' : 'confirmed' }}">
+                                        <button type="submit" class="btn btn-outline-{{ $booking->status === 'confirmed' ? 'danger' : 'success' }} btn-sm" title="{{ $booking->status === 'confirmed' ? 'Cancel' : 'Confirm' }}">
+                                            <i class="bi bi-{{ $booking->status === 'confirmed' ? 'x' : 'check' }}"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                <p class="mt-2">No bookings yet.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-    </div>
 
+        {{-- Pagination --}}
+        @if($bookings->hasPages())
+            <div class="mt-3">
+                {{ $bookings->links() }}
+            </div>
+        @endif
+    </div>
 </div>
 @endsection

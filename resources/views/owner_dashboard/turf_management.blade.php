@@ -2,240 +2,216 @@
 
 @section('content')
 <style>
-    .status-active { background:#d4f7df; color:#2e8b57; padding:2px 8px; border-radius:6px; font-size:12px; }
-    .status-maintenance { background:#ffe9b3; color:#b58900; padding:2px 8px; border-radius:6px; font-size:12px; }
-    .category-card { border:1px solid #e5e7eb; border-radius:10px; padding:18px; background:white; }
-    .category-card:hover { background:#f9fafb; }
-    .field-table th, .field-table td { vertical-align:middle; }
+    .status-active { background:#d4f7df; color:#2e8b57; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:600; }
+    .status-inactive { background:#fee2e2; color:#991b1b; padding:4px 12px; border-radius:6px; font-size:12px; font-weight:600; }
+    .turf-card { border:1px solid #e5e7eb; border-radius:10px; padding:20px; background:white; transition: all 0.3s; }
+    .turf-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
 </style>
 
 <div class="container-fluid">
-    <h3 class="fw-bold mb-3">Turf Management</h3>
-    <p class="text-muted">Manage your sport categories and fields.</p>
-
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#categories">Categories</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#fields">Fields</button>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-
-        <!-- Categories Tab -->
-        <div class="tab-pane fade show active" id="categories">
-            <div class="d-flex justify-content-between mb-3">
-                <h5 class="fw-bold">Sport Categories</h5>
-               <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-    + Add Category
-</button>
-            </div>
-
-            <div class="row g-3">
-                <!-- Category Item -->
-                <div class="col-md-4">
-                    <div class="category-card shadow-sm">
-                        <h6 class="fw-bold">Football</h6>
-                        <span class="status-active">active</span>
-                        <p class="mt-2 text-muted">3 fields</p>
-                        <button class="btn btn-outline-primary btn-sm">Edit</button>
-                        <button class="btn btn-outline-danger btn-sm">Delete</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="category-card shadow-sm">
-                        <h6 class="fw-bold">Cricket</h6>
-                        <span class="status-active">active</span>
-                        <p class="mt-2 text-muted">2 fields</p>
-                        <button class="btn btn-outline-primary btn-sm">Edit</button>
-                        <button class="btn btn-outline-danger btn-sm">Delete</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="category-card shadow-sm">
-                        <h6 class="fw-bold">Badminton</h6>
-                        <span class="status-active">active</span>
-                        <p class="mt-2 text-muted">2 fields</p>
-                        <button class="btn btn-outline-primary btn-sm">Edit</button>
-                        <button class="btn btn-outline-danger btn-sm">Delete</button>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="category-card shadow-sm">
-                        <h6 class="fw-bold">Tennis</h6>
-                        <span class="status-active">active</span>
-                        <p class="mt-2 text-muted">1 field</p>
-                        <button class="btn btn-outline-primary btn-sm">Edit</button>
-                        <button class="btn btn-outline-danger btn-sm">Delete</button>
-                    </div>
-                </div>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Turf Management</h3>
+            <p class="text-muted mb-0">Manage your turfs and their details.</p>
         </div>
-
-        <!-- Fields Tab -->
-        <div class="tab-pane fade" id="fields">
-            <div class="d-flex justify-content-between mb-3">
-                <h5 class="fw-bold">Fields</h5>
-                <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#addFieldModal">
-    + Add Field
-</button>
-
-            </div>
-
-            <div class="card p-3 shadow-sm">
-                <table class="table field-table">
-                    <thead>
-                        <tr>
-                            <th>Field Name</th>
-                            <th>Category</th>
-                            <th>Capacity</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Football Field A</strong><br><small class="text-muted">Premium football field</small></td>
-                            <td>Football</td>
-                            <td>22</td>
-                            <td>North Wing</td>
-                            <td><span class="status-active">active</span></td>
-                            <td>
-                                <button class="btn btn-outline-secondary btn-sm">✏️</button>
-                                <button class="btn btn-outline-danger btn-sm">🗑️</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td><strong>Football Field B</strong><br><small class="text-muted">Natural grass field</small></td>
-                            <td>Football</td>
-                            <td>22</td>
-                            <td>South Wing</td>
-                            <td><span class="status-active">active</span></td>
-                            <td>
-                                <button class="btn btn-outline-secondary btn-sm">✏️</button>
-                                <button class="btn btn-outline-danger btn-sm">🗑️</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td><strong>Cricket Ground</strong><br><small class="text-muted">Full-size cricket ground</small></td>
-                            <td>Cricket</td>
-                            <td>30</td>
-                            <td>East Wing</td>
-                            <td><span class="status-active">active</span></td>
-                            <td>
-                                <button class="btn btn-outline-secondary btn-sm">✏️</button>
-                                <button class="btn btn-outline-danger btn-sm">🗑️</button>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td><strong>Badminton Court 1</strong><br><small class="text-muted">Indoor court</small></td>
-                            <td>Badminton</td>
-                            <td>4</td>
-                            <td>Indoor Complex</td>
-                            <td><span class="status-maintenance">maintenance</span></td>
-                            <td>
-                                <button class="btn btn-outline-secondary btn-sm">✏️</button>
-                                <button class="btn btn-outline-danger btn-sm">🗑️</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addTurfModal">
+            <i class="bi bi-plus-lg me-1"></i> Add New Turf
+        </button>
     </div>
 
-    <!-- Add Category Button -->
-
-
-<!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Category</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <label class="fw-bold">Category Name</label>
-                <input type="text" class="form-control" placeholder="e.g. Football, Cricket, Tennis">
-
-                <label class="fw-bold mt-3">Description (Optional)</label>
-                <textarea class="form-control" rows="2" placeholder="Brief description of this sport category"></textarea>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-dark">Create Category</button>
-            </div>
-
+    @if(session('status'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('status') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </div>
-</div>
-<!-- Add Field Button -->
+    @endif
 
-<!-- Add Field Modal -->
-<div class="modal fade" id="addFieldModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Field</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <label class="fw-bold">Field Name</label>
-                <input type="text" class="form-control" placeholder="e.g. Football Field A">
-
-                <label class="fw-bold mt-3">Category</label>
-                <select class="form-control">
-                    <option>Select category</option>
-                    <option>Football</option>
-                    <option>Cricket</option>
-                    <option>Badminton</option>
-                    <option>Tennis</option>
-                </select>
-
-                <div class="d-flex gap-3 mt-3">
-                    <div class="flex-fill">
-                        <label class="fw-bold">Capacity</label>
-                        <input type="number" class="form-control" placeholder="e.g. 22">
+    {{-- Turfs Grid --}}
+    <div class="row g-4">
+        @forelse($turfs ?? [] as $turf)
+            <div class="col-md-6 col-lg-4">
+                <div class="turf-card shadow-sm">
+                    @if($turf->image_url)
+                        <img src="{{ $turf->image_url }}" alt="{{ $turf->name }}" class="img-fluid rounded mb-3" style="height: 150px; width: 100%; object-fit: cover;">
+                    @else
+                        <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 150px;">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    @endif
+                    
+                    <h5 class="fw-bold mb-2">{{ $turf->name }}</h5>
+                    <div class="mb-2">
+                        <span class="badge bg-info me-1">{{ $turf->sport_type }}</span>
+                        <span class="status-{{ $turf->status }}">{{ ucfirst($turf->status) }}</span>
                     </div>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-geo-alt"></i> {{ $turf->location }}, {{ $turf->city }}
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-currency-rupee"></i> Base Price: ₹{{ number_format($turf->base_price, 2) }}
+                    </p>
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-calendar-check"></i> {{ $turf->bookings_count ?? 0 }} bookings
+                    </p>
+                    
+                    @if($turf->description)
+                        <p class="text-muted small mb-3">{{ Str::limit($turf->description, 100) }}</p>
+                    @endif
 
-                    <div class="flex-fill">
-                        <label class="fw-bold">Location</label>
-                        <input type="text" class="form-control" placeholder="North Wing">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#editTurfModal{{ $turf->id }}">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <form method="POST" action="{{ route('owner.turfs.destroy', $turf) }}" class="flex-fill" onsubmit="return confirm('Are you sure you want to delete this turf? This action cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <label class="fw-bold mt-3">Description</label>
-                <textarea class="form-control" rows="2" placeholder="Brief description of this field"></textarea>
-
             </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-dark">Create Field</button>
+            <!-- Edit Turf Modal -->
+            <div class="modal fade" id="editTurfModal{{ $turf->id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Turf</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST" action="{{ route('owner.turfs.update', $turf) }}">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Turf Name</label>
+                                        <input type="text" name="name" class="form-control" value="{{ $turf->name }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Sport Type</label>
+                                        <input type="text" name="sport_type" class="form-control" value="{{ $turf->sport_type }}" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Location</label>
+                                        <input type="text" name="location" class="form-control" value="{{ $turf->location }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">City</label>
+                                        <input type="text" name="city" class="form-control" value="{{ $turf->city }}" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Base Price (₹)</label>
+                                    <input type="number" name="base_price" class="form-control" value="{{ $turf->base_price }}" min="0" step="0.01" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Image URL (Optional)</label>
+                                    <input type="url" name="image_url" class="form-control" value="{{ $turf->image_url }}" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Description (Optional)</label>
+                                    <textarea name="description" class="form-control" rows="3">{{ $turf->description }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Status</label>
+                                    <select name="status" class="form-select" required>
+                                        <option value="active" {{ $turf->status === 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ $turf->status === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-dark">Update Turf</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-        </div>
+        @empty
+            <div class="col-12">
+                <div class="card p-5 text-center">
+                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                    <h5 class="mt-3 text-muted">No turfs yet</h5>
+                    <p class="text-muted">Get started by adding your first turf!</p>
+                    <button class="btn btn-dark mt-2" data-bs-toggle="modal" data-bs-target="#addTurfModal">
+                        <i class="bi bi-plus-lg me-1"></i> Add Your First Turf
+                    </button>
+                </div>
+            </div>
+        @endforelse
     </div>
 </div>
 
+<!-- Add Turf Modal -->
+<div class="modal fade" id="addTurfModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Turf</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ route('owner.turfs.store') }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Turf Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Green Valley Football Turf" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Sport Type</label>
+                            <input type="text" name="sport_type" class="form-control" placeholder="e.g. Football, Cricket, Tennis" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Location</label>
+                            <input type="text" name="location" class="form-control" placeholder="e.g. Green Valley Sports Complex" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">City</label>
+                            <input type="text" name="city" class="form-control" placeholder="e.g. Mumbai" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Base Price (₹)</label>
+                        <input type="number" name="base_price" class="form-control" placeholder="e.g. 1200" min="0" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Image URL (Optional)</label>
+                        <input type="url" name="image_url" class="form-control" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description (Optional)</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Brief description of this turf"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark">Create Turf</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

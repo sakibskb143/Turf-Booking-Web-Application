@@ -92,7 +92,7 @@ class BookingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'slot_id' => ['required', 'exists:slots,id'],
+            'slot_id' => ['required', 'integer', 'exists:slots,id'],
         ]);
 
         $user = $request->user();
@@ -100,10 +100,25 @@ class BookingController extends Controller
         if ($user->role !== 'user') {
             abort(403, 'Only customers can create bookings.');
         }
+        
         $slotId = (int) $validated['slot_id'];
 
         DB::transaction(function () use ($slotId, $user) {
             $slot = Slot::lockForUpdate()->with('turf')->findOrFail($slotId);
+
+            // Check if turf is active
+            if ($slot->turf->status !== 'active') {
+                throw ValidationException::withMessages([
+                    'slot_id' => 'This turf is currently not available for booking.',
+                ]);
+            }
+
+            // Check if slot date is in the past
+            if ($slot->date->isPast() && !$slot->date->isToday()) {
+                throw ValidationException::withMessages([
+                    'slot_id' => 'Cannot book slots in the past.',
+                ]);
+            }
 
             // Check if slot is already booked by checking existing bookings
             $existingBooking = Booking::where('slot_id', $slot->id)
@@ -125,6 +140,13 @@ class BookingController extends Controller
             if ($userBooking) {
                 throw ValidationException::withMessages([
                     'slot_id' => 'You have already booked this slot.',
+                ]);
+            }
+
+            // Check if slot is available
+            if ($slot->status !== 'available') {
+                throw ValidationException::withMessages([
+                    'slot_id' => 'This slot is not available for booking.',
                 ]);
             }
 

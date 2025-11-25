@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Booking;
+use App\Models\Turf;
 use App\Models\UserNotification;
 
 class User extends Authenticatable
@@ -16,6 +17,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'address',
+        'role',
+        'status',
     ];
 
     protected $hidden = [
@@ -45,5 +50,13 @@ class User extends Authenticatable
     public function userNotifications()
     {
         return $this->hasMany(UserNotification::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get all turfs owned by this user (for owners)
+     */
+    public function turfs()
+    {
+        return $this->hasMany(Turf::class, 'owner_id', 'id');
     }
 }

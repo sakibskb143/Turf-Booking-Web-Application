@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\OwnerDashboardController;
+use App\Http\Controllers\TurfController;
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,12 +58,31 @@ Route::middleware(['auth', 'role:owner'])
     ->prefix('owner')
     ->name('owner.')
     ->group(function () {
-        Route::view('/dashboard', 'owner_dashboard.dashboard')->name('dashboard');
-        Route::view('/manage-turf', 'owner_dashboard.turf_management')->name('manageTurf');
-        Route::view('/manage-slots', 'owner_dashboard.manage_slots')->name('manageSlots');
-        Route::view('/bookings', 'owner_dashboard.bookings')->name('bookings');
+        // Dashboard
+        Route::get('/dashboard', [OwnerDashboardController::class, 'dashboard'])->name('dashboard');
+        
+        // Turf Management
+        Route::get('/manage-turf', [OwnerDashboardController::class, 'manageTurf'])->name('manageTurf');
+        Route::post('/turfs', [OwnerDashboardController::class, 'storeTurf'])->name('turfs.store');
+        Route::put('/turfs/{turf}', [OwnerDashboardController::class, 'updateTurf'])->name('turfs.update');
+        Route::delete('/turfs/{turf}', [OwnerDashboardController::class, 'destroyTurf'])->name('turfs.destroy');
+        
+        // Slot Management
+        Route::get('/manage-slots', [OwnerDashboardController::class, 'manageSlots'])->name('manageSlots');
+        Route::post('/turfs/{turf}/slots', [TurfController::class, 'storeSlot'])->name('slots.store');
+        Route::put('/slots/{slot}', [TurfController::class, 'updateSlot'])->name('slots.update');
+        Route::delete('/slots/{slot}', [TurfController::class, 'destroySlot'])->name('slots.destroy');
+        Route::get('/turfs/{turf}/slots-data', [TurfController::class, 'getSlots'])->name('slots.data');
+        
+        // Bookings
+        Route::get('/bookings', [OwnerDashboardController::class, 'bookings'])->name('bookings');
+        Route::put('/bookings/{booking}/status', [OwnerDashboardController::class, 'updateBookingStatus'])->name('bookings.updateStatus');
+        
+        // Coupons (view only for now)
         Route::view('/coupons', 'owner_dashboard.coupons')->name('coupons');
-        Route::view('/notifications', 'owner_dashboard.owner_notifications')->name('notifications');
+        
+        // Notifications
+        Route::get('/notifications', [OwnerDashboardController::class, 'notifications'])->name('notifications');
     });
 
 Route::middleware(['auth', 'role:admin'])

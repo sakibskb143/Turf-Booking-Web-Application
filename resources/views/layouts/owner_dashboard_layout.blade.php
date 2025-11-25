@@ -130,9 +130,12 @@
     <i class="bi bi-bell me-2"></i> Notifications
 </a>
 
-        <a href="">
-            <i class="bi bi-box-arrow-right me-2"></i> Logout
-        </a>
+        <form method="POST" action="{{ route('logout') }}" class="px-3 mt-3">
+            @csrf
+            <button type="submit" class="btn btn-outline-danger w-100" style="border: none; background: none; color: inherit; text-align: left; padding: 10px 15px; width: 100%;">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
+            </button>
+        </form>
     </div>
 
     <!-- MAIN CONTENT -->

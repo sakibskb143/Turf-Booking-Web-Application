@@ -14,11 +14,21 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         if (!$request->user()) {
-            return redirect()->route('users.login');
+            return redirect()->route('users.login')->with('error', 'Please login to access this page.');
         }
 
-        if (!in_array($request->user()->role, $roles, true)) {
-            abort(Response::HTTP_FORBIDDEN, 'You are not authorized to access this resource.');
+        $userRole = $request->user()->role;
+        
+        if (!in_array($userRole, $roles, true)) {
+            // Redirect based on user's actual role
+            $redirectRoute = match ($userRole) {
+                'owner' => 'owner.dashboard',
+                'admin' => 'admin.dashboard',
+                default => 'user.dashboard',
+            };
+            
+            return redirect()->route($redirectRoute)
+                ->with('error', 'You are not authorized to access this resource.');
         }
 
         return $next($request);
