@@ -93,6 +93,8 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'slot_id' => ['required', 'integer', 'exists:slots,id'],
+            'payment_method' => ['required', 'string', 'in:Bkash,Rocket,Nagad'],
+            'transaction_id' => ['required', 'string', 'max:255'],
         ]);
 
         $user = $request->user();
@@ -156,7 +158,9 @@ class BookingController extends Controller
                 'slot_id' => $slot->id,
                 'total_amount' => $slot->price,
                 'status' => 'confirmed',
-                'payment_status' => 'unpaid',
+                'payment_status' => 'paid',
+                'payment_method' => $validated['payment_method'],
+                'transaction_id' => $validated['transaction_id'],
             ]);
 
             $slot->update(['status' => 'booked']);
@@ -192,6 +196,51 @@ class BookingController extends Controller
         return redirect()
             ->route('user.bookings')
             ->with('status', 'Your booking has been created successfully.');
+    }
+
+    public function showByCategory(Request $request, string $category)
+    {
+        $selectedDate = $request->input('date', now()->toDateString());
+        
+        $turfs = Turf::query()
+            ->where('sport_type', strtolower($category))
+            ->where('status', 'active')
+            ->with(['slots' => function ($query) use ($selectedDate) {
+                $query->whereDate('date', $selectedDate)
+                    ->with(['bookings' => function ($q) {
+                        $q->where('status', '!=', 'cancelled');
+                    }])
+                    ->orderBy('start_time');
+            }])
+            ->with('owner')
+            ->get();
+
+        return view('pages.turf_details', [
+            'category' => $category,
+            'turfs' => $turfs,
+            'selectedDate' => $selectedDate,
+        ]);
+    }
+
+    public function showTurfDetails(Request $request, Turf $turf)
+    {
+        $selectedDate = $request->input('date', now()->toDateString());
+        
+        $turf->load([
+            'owner',
+            'slots' => function ($query) use ($selectedDate) {
+                $query->whereDate('date', $selectedDate)
+                    ->with(['bookings' => function ($q) {
+                        $q->where('status', '!=', 'cancelled');
+                    }])
+                    ->orderBy('start_time');
+            }
+        ]);
+
+        return view('pages.turf_details', [
+            'turf' => $turf,
+            'selectedDate' => $selectedDate,
+        ]);
     }
 }
 

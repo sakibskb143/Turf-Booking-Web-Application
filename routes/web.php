@@ -40,9 +40,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/logout', 'logout')->name('logout')->middleware('auth');
 });
 
-Route::get('/booking-system/{category}', function (string $category) {
-    return view('pages.bookingsystem', compact('category'));
-});
+Route::get('/booking-system/{category}', [BookingController::class, 'showByCategory'])->name('booking.system');
+Route::get('/turfs/{turf}/details', [BookingController::class, 'showTurfDetails'])->name('turfs.details');
 
 Route::middleware(['auth', 'role:user'])
     ->prefix('user')

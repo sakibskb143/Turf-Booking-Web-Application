@@ -264,7 +264,7 @@
                     <h5 class="card-title fw-bold">Football</h5>
                     <p class="text-muted">Book premium football fields and practice grounds.</p>
 
-                    <a href="{{ url('booking-system/football') }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('booking.system', 'football') }}" class="btn btn-success btn-sm">
                         View Fields
                     </a>
 
@@ -279,7 +279,7 @@
                     <h5 class="card-title fw-bold">Cricket</h5>
                     <p class="text-muted">Rent quality turfs and nets for cricket practice or matches.</p>
 
-                    <a href="{{ url('booking-system/cricket') }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('booking.system', 'cricket') }}" class="btn btn-success btn-sm">
                         View Fields
                     </a>
 
@@ -294,7 +294,7 @@
                     <h5 class="card-title fw-bold">Tennis</h5>
                     <p class="text-muted">Find professional tennis courts in your area.</p>
 
-                    <a href="{{ url('booking-system/tennis') }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('booking.system', 'tennis') }}" class="btn btn-success btn-sm">
                         View Fields
                     </a>
 
@@ -426,11 +426,18 @@
                                 @if ($slotAvailable)
                                     @auth
                                         @if (auth()->user()->role === 'user')
-                                            <form method="POST" action="{{ route('bookings.store') }}">
-                                                @csrf
-                                                <input type="hidden" name="slot_id" value="{{ $slot->id }}">
-                                                <button class="btn btn-success btn-sm">Book</button>
-                                            </form>
+                                            <button class="btn btn-success btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#bookingModal"
+                                                    data-slot-id="{{ $slot->id }}"
+                                                    data-turf-id="{{ $turf->id }}"
+                                                    data-turf-name="{{ $turf->name }}"
+                                                    data-turf-location="{{ $turf->location }}"
+                                                    data-slot-time="{{ $startTime }} - {{ $endTime }}"
+                                                    data-slot-date="{{ $slot->date->format('Y-m-d') }}"
+                                                    data-slot-price="{{ $slot->price }}">
+                                                Book Now
+                                            </button>
                                         @else
                                             <span class="badge bg-warning text-dark">Login as user to book</span>
                                         @endif
@@ -557,6 +564,193 @@
         </div>
     </div>
 </section>
+
+<!-- Booking Modal -->
+@auth
+@if(auth()->user()->role === 'user')
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="bookingModalLabel">
+                    <i class="fas fa-calendar-check"></i> Confirm Your Booking
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="bookingForm" method="POST" action="{{ route('bookings.store') }}">
+                @csrf
+                <input type="hidden" name="slot_id" id="modal_slot_id">
+                <div class="modal-body">
+                    <!-- Booking Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-success mb-3">
+                                <i class="fas fa-map-marker-alt"></i> Your Address
+                            </h6>
+                            <div class="card bg-light p-3">
+                                <p class="mb-0">
+                                    <strong>{{ auth()->user()->name }}</strong><br>
+                                    {{ auth()->user()->address ?? 'No address provided' }}<br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-phone"></i> {{ auth()->user()->phone ?? 'N/A' }}
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-success mb-3">
+                                <i class="fas fa-building"></i> Turf Address
+                            </h6>
+                            <div class="card bg-light p-3">
+                                <p class="mb-0" id="modal_turf_address">
+                                    <strong id="modal_turf_name"></strong><br>
+                                    <span id="modal_turf_location"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Slot -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-clock"></i> Selected Slot
+                        </h6>
+                        <p class="mb-0">
+                            <strong>Date:</strong> <span id="modal_slot_date"></span><br>
+                            <strong>Time:</strong> <span id="modal_slot_time"></span><br>
+                            <strong>Price:</strong> <span class="text-success fw-bold">₹<span id="modal_slot_price"></span></span>
+                        </p>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-credit-card"></i> Select Payment Method
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="payment-method-card">
+                                    <input type="radio" name="payment_method" value="Bkash" required>
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Bkash_Logo.png" 
+                                                     alt="Bkash" style="height: 30px;">
+                                            </div>
+                                            <strong>Bkash</strong>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="payment-method-card">
+                                    <input type="radio" name="payment_method" value="Rocket" required>
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Rocket_Bangladesh_Logo.png" 
+                                                     alt="Rocket" style="height: 30px;">
+                                            </div>
+                                            <strong>Rocket</strong>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="payment-method-card">
+                                    <input type="radio" name="payment_method" value="Nagad" required>
+                                    <div class="card text-center h-100">
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <img src="https://www.nagad.com.bd/sites/default/files/nagad_logo.png" 
+                                                     alt="Nagad" style="height: 30px;">
+                                            </div>
+                                            <strong>Nagad</strong>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction ID -->
+                    <div class="mb-4">
+                        <label for="transaction_id" class="form-label fw-bold">
+                            <i class="fas fa-receipt"></i> Transaction ID
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="transaction_id" 
+                               name="transaction_id" 
+                               placeholder="Enter your transaction ID" 
+                               required>
+                        <small class="text-muted">Please enter the transaction ID from your payment confirmation.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> Confirm Booking
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-method-card {
+        cursor: pointer;
+        margin: 0;
+    }
+    .payment-method-card input[type="radio"] {
+        display: none;
+    }
+    .payment-method-card .card {
+        border: 2px solid #dee2e6;
+        transition: all 0.3s;
+    }
+    .payment-method-card input[type="radio"]:checked + .card {
+        border-color: #28a745;
+        background-color: #f0f9f4;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .payment-method-card:hover .card {
+        border-color: #28a745;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookingModal = document.getElementById('bookingModal');
+    if (bookingModal) {
+        bookingModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const slotId = button.getAttribute('data-slot-id');
+            const turfId = button.getAttribute('data-turf-id');
+            const turfName = button.getAttribute('data-turf-name');
+            const turfLocation = button.getAttribute('data-turf-location');
+            const slotTime = button.getAttribute('data-slot-time');
+            const slotDate = button.getAttribute('data-slot-date');
+            const slotPrice = button.getAttribute('data-slot-price');
+
+            document.getElementById('modal_slot_id').value = slotId;
+            document.getElementById('modal_turf_name').textContent = turfName;
+            document.getElementById('modal_turf_location').textContent = turfLocation;
+            document.getElementById('modal_slot_time').textContent = slotTime;
+            document.getElementById('modal_slot_date').textContent = new Date(slotDate).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('modal_slot_price').textContent = parseFloat(slotPrice).toFixed(2);
+        });
+    }
+});
+</script>
+@endif
+@endauth
 
 <!-- FOOTER -->
 <section>
