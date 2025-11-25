@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -98,6 +99,13 @@ class OwnerDashboardController extends Controller
             abort(403, 'Only owners can create turfs.');
         }
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('turfs', 'public');
+        } elseif (isset($validated['image_url'])) {
+            $imagePath = $validated['image_url'];
+        }
+
         Turf::create([
             'owner_id' => $owner->id,
             'name' => $validated['name'],
@@ -107,7 +115,7 @@ class OwnerDashboardController extends Controller
             'city' => $validated['city'],
             'description' => $validated['description'] ?? null,
             'base_price' => $validated['base_price'],
-            'image_url' => $validated['image_url'] ?? null,
+            'image_url' => $imagePath,
             'status' => $validated['status'],
         ]);
 
@@ -132,9 +140,21 @@ class OwnerDashboardController extends Controller
             'city' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'base_price' => ['required', 'numeric', 'min:0'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'image_url' => ['nullable', 'url', 'max:500'],
             'status' => ['required', 'in:active,inactive'],
         ]);
+
+        $imagePath = $turf->image_url;
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($turf->image_url && !filter_var($turf->image_url, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($turf->image_url)) {
+                Storage::disk('public')->delete($turf->image_url);
+            }
+            $imagePath = $request->file('image')->store('turfs', 'public');
+        } elseif (isset($validated['image_url'])) {
+            $imagePath = $validated['image_url'];
+        }
 
         $turf->update([
             'name' => $validated['name'],
@@ -144,7 +164,7 @@ class OwnerDashboardController extends Controller
             'city' => $validated['city'],
             'description' => $validated['description'] ?? null,
             'base_price' => $validated['base_price'],
-            'image_url' => $validated['image_url'] ?? null,
+            'image_url' => $imagePath,
             'status' => $validated['status'],
         ]);
 
@@ -288,5 +308,30 @@ class OwnerDashboardController extends Controller
         return view('owner_dashboard.owner_notifications', [
             'notifications' => $notifications,
         ]);
+    }
+
+    public function profile(Request $request)
+    {
+        return view('owner_dashboard.profile', [
+            'owner' => $request->user(),
+        ]);
+    }
+
+    public function updateProfile(Request $request): RedirectResponse
+    {
+        $owner = $request->user();
+        
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $owner->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $owner->update($validated);
+
+        return redirect()
+            ->route('owner.profile')
+            ->with('status', 'Profile updated successfully.');
     }
 }

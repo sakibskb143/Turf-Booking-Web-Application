@@ -105,7 +105,7 @@ class BookingController extends Controller
         
         $slotId = (int) $validated['slot_id'];
 
-        DB::transaction(function () use ($slotId, $user) {
+        DB::transaction(function () use ($slotId, $user, $validated) {
             $slot = Slot::lockForUpdate()->with('turf')->findOrFail($slotId);
 
             // Check if turf is active

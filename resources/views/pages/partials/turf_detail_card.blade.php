@@ -1,5 +1,5 @@
 <div class="card turf-card shadow-sm">
-    <img src="{{ $turf->image_url ?? 'https://via.placeholder.com/800x300?text=' . urlencode($turf->name) }}" 
+    <img src="{{ $turf->image_url ? (filter_var($turf->image_url, FILTER_VALIDATE_URL) ? $turf->image_url : asset('storage/' . $turf->image_url)) : 'https://via.placeholder.com/800x300?text=' . urlencode($turf->name) }}" 
          class="turf-image" 
          alt="{{ $turf->name }}">
     <div class="card-body p-4">
@@ -53,6 +53,7 @@
                                             data-turf-id="{{ $turf->id }}"
                                             data-turf-name="{{ $turf->name }}"
                                             data-turf-location="{{ $turf->location }}, {{ $turf->city }}"
+                                            data-turf-image="{{ $turf->image_url ? (filter_var($turf->image_url, FILTER_VALIDATE_URL) ? $turf->image_url : asset('storage/' . $turf->image_url)) : 'https://via.placeholder.com/400x250?text=' . urlencode($turf->name) }}"
                                             data-slot-time="{{ $startTime }} - {{ $endTime }}"
                                             data-slot-date="{{ $slot->date->format('Y-m-d') }}"
                                             data-slot-price="{{ $slot->price }}">
@@ -128,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     `;
                                 } else {
                                     if (isAuthenticated && userRole === 'user') {
+                                        const turfImage = @json($turf->image_url ? (filter_var($turf->image_url, FILTER_VALIDATE_URL) ? $turf->image_url : asset('storage/' . $turf->image_url)) : 'https://via.placeholder.com/400x250?text=' . urlencode($turf->name));
                                         slotDiv.innerHTML = `
                                             <button class="slot-box w-100" 
                                                     data-bs-toggle="modal" 
@@ -136,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     data-turf-id="${turfId}"
                                                     data-turf-name="${turfName}"
                                                     data-turf-location="${turfLocation}"
+                                                    data-turf-image="${turfImage}"
                                                     data-slot-time="${slot.start_time} - ${slot.end_time}"
                                                     data-slot-date="${slot.date}"
                                                     data-slot-price="${slot.price}">

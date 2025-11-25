@@ -39,7 +39,7 @@
             <div class="col-md-6 col-lg-4">
                 <div class="turf-card shadow-sm">
                     @if($turf->image_url)
-                        <img src="{{ $turf->image_url }}" alt="{{ $turf->name }}" class="img-fluid rounded mb-3" style="height: 150px; width: 100%; object-fit: cover;">
+                        <img src="{{ filter_var($turf->image_url, FILTER_VALIDATE_URL) ? $turf->image_url : asset('storage/' . $turf->image_url) }}" alt="{{ $turf->name }}" class="img-fluid rounded mb-3" style="height: 150px; width: 100%; object-fit: cover;">
                     @else
                         <div class="bg-light rounded mb-3 d-flex align-items-center justify-content-center" style="height: 150px;">
                             <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
@@ -88,7 +88,7 @@
                             <h5 class="modal-title">Edit Turf</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <form method="POST" action="{{ route('owner.turfs.update', $turf) }}">
+                        <form method="POST" action="{{ route('owner.turfs.update', $turf) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-body">
@@ -117,8 +117,18 @@
                                     <input type="number" name="base_price" class="form-control" value="{{ $turf->base_price }}" min="0" step="0.01" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Image URL (Optional)</label>
-                                    <input type="url" name="image_url" class="form-control" value="{{ $turf->image_url }}" placeholder="https://example.com/image.jpg">
+                                    <label class="form-label fw-bold">Turf Image</label>
+                                    @if($turf->image_url && !filter_var($turf->image_url, FILTER_VALIDATE_URL))
+                                        <div class="mb-2">
+                                            <img src="{{ asset('storage/' . $turf->image_url) }}" alt="Current image" class="img-thumbnail" style="max-height: 100px;">
+                                        </div>
+                                    @endif
+                                    <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif">
+                                    <small class="text-muted">Upload an image (JPG, PNG, GIF - Max 2MB) or provide an image URL below</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Image URL (Optional - Alternative to upload)</label>
+                                    <input type="url" name="image_url" class="form-control" value="{{ filter_var($turf->image_url, FILTER_VALIDATE_URL) ? $turf->image_url : '' }}" placeholder="https://example.com/image.jpg">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Description (Optional)</label>
@@ -163,7 +173,7 @@
                 <h5 class="modal-title">Add New Turf</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="{{ route('owner.turfs.store') }}">
+            <form method="POST" action="{{ route('owner.turfs.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
@@ -191,7 +201,12 @@
                         <input type="number" name="base_price" class="form-control" placeholder="e.g. 1200" min="0" step="0.01" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Image URL (Optional)</label>
+                        <label class="form-label fw-bold">Turf Image</label>
+                        <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif">
+                        <small class="text-muted">Upload an image (JPG, PNG, GIF - Max 2MB) or provide an image URL below</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Image URL (Optional - Alternative to upload)</label>
                         <input type="url" name="image_url" class="form-control" placeholder="https://example.com/image.jpg">
                     </div>
                     <div class="mb-3">

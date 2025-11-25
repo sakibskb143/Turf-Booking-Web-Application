@@ -130,6 +130,10 @@
     <i class="bi bi-bell me-2"></i> Notifications
 </a>
 
+        <a href="{{ route('owner.profile') }}" class="{{ Request::is('owner/profile') ? 'active-link' : '' }}">
+            <i class="bi bi-person-circle me-2"></i> Profile & Settings
+        </a>
+
         <form method="POST" action="{{ route('logout') }}" class="px-3 mt-3">
             @csrf
             <button type="submit" class="btn btn-outline-danger w-100" style="border: none; background: none; color: inherit; text-align: left; padding: 10px 15px; width: 100%;">

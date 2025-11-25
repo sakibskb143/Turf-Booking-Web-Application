@@ -82,6 +82,10 @@ Route::middleware(['auth', 'role:owner'])
         
         // Notifications
         Route::get('/notifications', [OwnerDashboardController::class, 'notifications'])->name('notifications');
+        
+        // Profile
+        Route::get('/profile', [OwnerDashboardController::class, 'profile'])->name('profile');
+        Route::put('/profile', [OwnerDashboardController::class, 'updateProfile'])->name('profile.update');
     });
 
 Route::middleware(['auth', 'role:admin'])
